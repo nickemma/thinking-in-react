@@ -1,9 +1,7 @@
+import ListGroup from './components/ListGroup';
+
 const App = () => {
-  return (
-    <div className="container">
-      <h1>Hello, world!</h1>
-    </div>
-  );
+  return <ListGroup />;
 };
 
 export default App;
