@@ -1,30 +1,37 @@
-import { NextFunction, Response, Request } from 'express';
-import jwt from 'jsonwebtoken';
-import User from '../models/userModel';
+import { NextFunction, Response } from 'express';
+import AuthorizedRequest from '../types/request';
+import jwt, { Secret } from 'jsonwebtoken';
 
-const secret = process.env.JWT_SECRET || '';
+const secretKey = process.env.JWT_SECRET;
 
 const protect = async (
-  req: Request<any>,
+  // req: AuthorizedRequest<any>,
+  req: AuthorizedRequest<any>,
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.cookies.token;
-  const requestToken = token || req.headers.authorization?.split(' ')[1];
+  // If system doesn't support cookies, use authorization header
+  const cookieToken = req.cookies.token;
+  const requestToken = cookieToken || req.headers.authorization?.split(' ')[1];
+  console.log('Cookie Token:', cookieToken);
+  console.log('Request Token:', requestToken);
 
   if (requestToken) {
     try {
-      const decoded: any = jwt.verify(requestToken, secret);
+      // verify token
+      const decoded: any = jwt.verify(requestToken, secretKey as Secret);
+      console.log('Decoded Token:', decoded);
+      // get user id from decoded token
+      req.user = decoded.id;
 
-      req.User = decoded.id;
-
+      // pass user to next middleware
       next();
-    } catch (err: any) {
-      res.clearCookie(token);
-      return res.status(400).json({ message: 'Not authorized' });
+    } catch (error) {
+      console.error('Token Verification Error:', error);
+      return res.status(401).json({ message: 'Unauthorized' });
     }
   } else {
-    res.status(401).json({ message: 'Not authorized, no token' });
+    res.status(401).json({ message: 'Access denied, no token' });
   }
 };
 

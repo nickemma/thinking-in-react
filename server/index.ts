@@ -13,13 +13,13 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.ORIGIN || 'http://localhost:3000',
     credentials: true,
   })
 );
 app.use(morgan('dev'));
 app.use(cookieParser());
 
+//============= test Route for server
 app.get('/', (req, res) => {
   res.send('Welcome to the Authentication API!');
 });
@@ -35,7 +35,6 @@ mongoose.set('strictQuery', false);
 mongoose
   .connect(CONNECTION_URI)
   .then(() => {
-    console.log('Connected to MongoDB');
     app.listen(PORT, () => {
       console.log(`Server running on port http://localhost:${PORT}`);
     });
