@@ -13,6 +13,7 @@ const secretKey = process.env.JWT_SECRET;
 const tokenExpiration = process.env.NODE_ENV === 'development' ? '1d' : '7d';
 
 const generateToken = (id: string) => {
+  console.log('Generating token for ID:', id);
   return jwt.sign({ id }, secretKey as Secret, {
     expiresIn: tokenExpiration,
   });
@@ -27,7 +28,8 @@ const generateToken = (id: string) => {
 export const getUser = async (req: AuthorizedRequest<any>, res: Response) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id).select('-password');
+    console.log('Getting user with ID:', id);
+    const user = await User.findById(req.user).select('-password');
     if (user) {
       const { _id, name, email, image, bio, phone } = user;
       res.status(200).json({ _id, name, email, image, bio, phone });
@@ -46,7 +48,7 @@ export const getUser = async (req: AuthorizedRequest<any>, res: Response) => {
  */
 
 export const register = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, image, bio, phone } = req.body;
 
   try {
     // validations here
@@ -66,14 +68,17 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    const newUser = await User.create({
+    const user = await User.create({
       name,
       email,
       password,
+      image,
+      bio,
+      phone,
     });
 
     // Convert ObjectId to string
-    const token = generateToken(newUser._id.toString());
+    const token = generateToken(user._id.toString());
 
     // Set the token in a cookie with the same name as the token
     res.cookie('token', token, {
@@ -84,8 +89,12 @@ export const register = async (req: Request, res: Response) => {
       secure: true,
     });
 
-    if (newUser) {
-      const { _id, name, email, image, bio, phone } = newUser;
+    if (user) {
+      const { _id, name, email, image, bio, phone } = user;
+      console.log(
+        'User verified and created successfully. Generating token...'
+      );
+      console.log('Decoded Token Register:', token); // Make sure to decode the token here
       res.status(201).json({ _id, name, email, image, bio, phone, token });
     }
   } catch (error) {
@@ -133,6 +142,8 @@ export const login = async (req: Request, res: Response) => {
 
     if (user && isPasswordValid) {
       const { _id, name, email, image, bio, phone } = user;
+      console.log('User verified and password valid. Generating token...');
+      console.log('Decoded Token Login:', token); // Make sure to decode the token here
       res.status(200).json({ _id, name, email, image, bio, phone, token });
     } else {
       res.status(400).json({ message: 'Invalid Email or Password' });

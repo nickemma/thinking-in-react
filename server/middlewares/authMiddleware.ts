@@ -12,23 +12,23 @@ const protect = async (
 ) => {
   // If system doesn't support cookies, use authorization header
   const cookieToken = req.cookies.token;
-  const requestToken = cookieToken || req.headers.authorization?.split(' ')[1];
+  console.log('Verifying token...');
   console.log('Cookie Token:', cookieToken);
-  console.log('Request Token:', requestToken);
 
-  if (requestToken) {
+  if (cookieToken) {
     try {
       // verify token
-      const decoded: any = jwt.verify(requestToken, secretKey as Secret);
-      console.log('Decoded Token:', decoded);
+      const decoded: any = jwt.verify(cookieToken, secretKey as Secret);
+      console.log('Decoded Token Middleware:', decoded);
       // get user id from decoded token
       req.user = decoded.id;
+      console.log('User ID:', req.user);
 
       // pass user to next middleware
       next();
     } catch (error) {
       console.error('Token Verification Error:', error);
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: 'Unauthorized Access' });
     }
   } else {
     res.status(401).json({ message: 'Access denied, no token' });
