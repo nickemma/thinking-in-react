@@ -27,8 +27,6 @@ const generateToken = (id: string) => {
 
 export const getUser = async (req: AuthorizedRequest<any>, res: Response) => {
   try {
-    const { id } = req.params;
-    console.log('Getting user with ID:', id);
     const user = await User.findById(req.user).select('-password');
     if (user) {
       const { _id, name, email, image, bio, phone } = user;
@@ -91,10 +89,6 @@ export const register = async (req: Request, res: Response) => {
 
     if (user) {
       const { _id, name, email, image, bio, phone } = user;
-      console.log(
-        'User verified and created successfully. Generating token...'
-      );
-      console.log('Decoded Token Register:', token); // Make sure to decode the token here
       res.status(201).json({ _id, name, email, image, bio, phone, token });
     }
   } catch (error) {
@@ -142,8 +136,6 @@ export const login = async (req: Request, res: Response) => {
 
     if (user && isPasswordValid) {
       const { _id, name, email, image, bio, phone } = user;
-      console.log('User verified and password valid. Generating token...');
-      console.log('Decoded Token Login:', token); // Make sure to decode the token here
       res.status(200).json({ _id, name, email, image, bio, phone, token });
     } else {
       res.status(400).json({ message: 'Invalid Email or Password' });
