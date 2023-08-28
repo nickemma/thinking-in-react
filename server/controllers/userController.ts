@@ -13,7 +13,6 @@ const secretKey = process.env.JWT_SECRET;
 const tokenExpiration = process.env.NODE_ENV === 'development' ? '1d' : '7d';
 
 const generateToken = (id: string) => {
-  console.log('Generating token for ID:', id);
   return jwt.sign({ id }, secretKey as Secret, {
     expiresIn: tokenExpiration,
   });
@@ -34,7 +33,7 @@ export const getUser = async (req: AuthorizedRequest<any>, res: Response) => {
     } else {
       res.status(400).json({ message: 'User not found' });
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: 'Something went wrong' });
   }
 };
@@ -91,7 +90,17 @@ export const register = async (req: Request, res: Response) => {
       const { _id, name, email, image, bio, phone } = user;
       res.status(201).json({ _id, name, email, image, bio, phone, token });
     }
-  } catch (error) {
+  } catch (error: any) {
+    if (error.name === 'ValidationError') {
+      // Handle validation error
+      const validationErrors = Object.values(error.errors).map(
+        (err: any) => err.message
+      );
+      return res
+        .status(400)
+        .json({ message: 'Validation error', errors: validationErrors });
+    }
+
     console.error(error);
     res.status(500).json({ message: 'Something went wrong' });
   }
@@ -140,7 +149,7 @@ export const login = async (req: Request, res: Response) => {
     } else {
       res.status(400).json({ message: 'Invalid Email or Password' });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.status(500).json({ message: 'Something went wrong' });
   }
