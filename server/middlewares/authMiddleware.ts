@@ -12,11 +12,12 @@ const protect = async (
 ) => {
   // If system doesn't support cookies, use authorization header
   const cookieToken = req.cookies.token;
+  const requestToken = cookieToken || req.headers.authorization?.split(' ')[1];
 
-  if (cookieToken) {
+  if (requestToken) {
     try {
       // verify token
-      const decoded: any = jwt.verify(cookieToken, secretKey as Secret);
+      const decoded: any = jwt.verify(requestToken, secretKey as Secret);
 
       // get user id from decoded token
       req.user = decoded.id;
