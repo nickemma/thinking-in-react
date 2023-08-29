@@ -156,6 +156,43 @@ export const login = async (req: Request, res: Response) => {
 };
 
 /*
+ * @route   POST api/users/updateuser
+ * @desc    Update a user
+ * @access  Private
+ */
+
+export const updateUser = async (
+  req: AuthorizedRequest<any>,
+  res: Response
+) => {
+  try {
+    const user = await User.findById(req.user);
+    if (user) {
+      const { name, email, image, bio, phone } = user;
+      user.email = email;
+      user.name = req.body.name || name;
+      user.image = req.body.image || image;
+      user.bio = req.body.bio || bio;
+      user.phone = req.body.phone || phone;
+
+      const updatedUser = await user.save();
+      res.status(200).json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        image: updatedUser.image,
+        bio: updatedUser.bio,
+        phone: updatedUser.phone,
+      });
+    } else {
+      res.status(400).json({ message: 'User not found' });
+    }
+  } catch (error: any) {
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
+/*
  * @route   POST api/users/logout
  * @desc    Logout a user
  * @access  Public
