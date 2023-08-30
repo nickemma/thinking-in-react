@@ -326,6 +326,7 @@ export const resetPassword = async (req: Request, res: Response) => {
       expiresAt: { $gt: Date.now() },
     });
 
+    console.log(userToken);
     // if the token is not found
     if (!userToken) {
       return res
