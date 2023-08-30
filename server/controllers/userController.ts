@@ -225,7 +225,9 @@ export const changePassword = async (
     if (user && isPasswordValid) {
       user.password = password;
       await user.save();
-      res.status(200).json({ message: 'Password changed successfully' });
+      res
+        .status(200)
+        .json({ message: 'Password changed successfully, Please login' });
     } else {
       res.status(400).json({ message: 'Old Password is incorrect, try again' });
     }
@@ -265,6 +267,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
       .update(resetToken)
       .digest('hex');
 
+    console.log(hashedResetToken);
     // save the hashed reset token to the database
     await Token.create({
       userId: user._id,
