@@ -25,7 +25,7 @@ const protect = async (
       // pass user to next middleware
       next();
     } catch (error) {
-      console.error('Token Verification Error:', error);
+    
       return res.status(401).json({ message: 'Unauthorized Access' });
     }
   } else {
