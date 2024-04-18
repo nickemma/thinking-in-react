@@ -56,10 +56,10 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Please fill all fields' });
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       return res
         .status(400)
-        .json({ message: 'Password must be at least 6 characters long' });
+        .json({ message: 'Password must be at least 8 characters long' });
     }
 
     const existingUser = await User.findOne({ email });

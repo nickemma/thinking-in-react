@@ -28,7 +28,7 @@ const UserSchema = new mongoose.Schema(
           return passwordPattern.test(value);
         },
         message:
-          'Password must contain at least one number, one uppercase letter, one lowercase letter, and be at least 6 characters long',
+          'Password must contain at least one number, one uppercase letter, one lowercase letter, and be at least 8 characters long',
       },
     },
     image: {
